@@ -28,12 +28,15 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
 public class ClientController implements Initializable {
+
     private Net network;
     @FXML
     public TableView<FileInfo> clientView;
     public TableView<FileInfo> serverView;
     public TextField textField;
+    public TextField textFieldS;
     public ComboBox<String> disksBox; // перечисление дисков
+    public ComboBox<String> disksBoxS;
     public Label clientLabel;
     public Label serverLabel;
 
@@ -110,7 +113,8 @@ public class ClientController implements Initializable {
                         setText("");
                         setStyle("");
                     } else {
-                        String text = String.format("%,d bytes", item);
+                        String text = String.format("%,d bytes", item);// размер с пробелами
+                        // если размер файла -1
                         if (item == -1L) {
                             text = "[DIR]";
                         }
@@ -130,15 +134,15 @@ public class ClientController implements Initializable {
         //создаем колонки на сервере
         //в таблице будет зраниться файл инфи и будет преобразована к строке
         TableColumn<FileInfo, String> fileTypeColumnS = new TableColumn<>();
-        // fileTypeColumnS.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getType().getName()));
+        fileTypeColumnS.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getType().getName()));
         fileTypeColumnS.setPrefWidth(24);// по умолчанию ширина столбца
 
         TableColumn<FileInfo, String> fileNameColumnS = new TableColumn<>("Name");
-        //fileNameColumnS.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getFilename()));
+        fileNameColumnS.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getFilename()));
         fileNameColumnS.setPrefWidth(240);// по умолчанию ширина столбца
 
         TableColumn<FileInfo, Long> filesSizeColumnS = new TableColumn<>("Size");
-        //filesSizeColumnS.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSize()));
+        filesSizeColumnS.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSize()));
         filesSizeColumnS.setPrefWidth(120);// по умолчанию ширина столбца
         filesSizeColumnS.setCellFactory(column -> {
             // как выглядит ячейка с столбце
@@ -162,20 +166,26 @@ public class ClientController implements Initializable {
         });
         DateTimeFormatter dtfS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         TableColumn<FileInfo, String> fileDateColumnS = new TableColumn<>("Date");
-        //fileDateColumnS.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getLastModified().format(dtf)));
+        fileDateColumnS.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getLastModified().format(dtfS)));
         fileDateColumnS.setPrefWidth(120);// по умолчанию ширина столбца
         // на клиенте добавили и отсортировали колонки
         serverView.getColumns().addAll(fileTypeColumnS, fileNameColumnS, filesSizeColumnS, fileDateColumnS);
         serverView.getSortOrder().add(fileTypeColumnS);
 
         disksBox.getItems().clear();
-
         for (Path p : FileSystems.getDefault().getRootDirectories()) {
             disksBox.getItems().add(p.toString());
         }
         disksBox.getSelectionModel().select(0);
-        updateList(Paths.get("."));
 
+        disksBoxS.getItems().clear();
+        for (Path p : FileSystems.getDefault().getRootDirectories()) {
+            disksBoxS.getItems().add(p.toString());
+        }
+        disksBoxS.getSelectionModel().select(0);
+        // первоначальное заполнение, при открытии таблиц
+        updateList(Paths.get("."));
+        updateListS(Paths.get(".", "serverDir"));
         clientView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -183,6 +193,18 @@ public class ClientController implements Initializable {
                     Path path = Paths.get(textField.getText()).resolve(clientView.getSelectionModel().getSelectedItem().getFilename());
                     if (Files.isDirectory(path)) {
                         updateList(path);
+                    }
+                }
+            }
+        });
+
+        serverView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount() == 2) {
+                    Path path = Paths.get(textFieldS.getText()).resolve(serverView.getSelectionModel().getSelectedItem().getFilename());
+                    if (Files.isDirectory(path)) {
+                        updateListS(path);
                     }
                 }
             }
@@ -208,20 +230,42 @@ public class ClientController implements Initializable {
             e.printStackTrace();
         }*/
     }
+
     public void updateList(Path path) {
 
         try {
+            //  наполним списком файлов которые есть куда указан любой путь
             textField.setText(path.normalize().toAbsolutePath().toString());
             clientView.getItems().clear();
             clientView.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
             clientView.sort();
+
         } catch (IOException e) {
             // Всплывающее окно. И подождать пока пользователь нажмет на ок
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось обновить список файлов", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось обновить список файлов клиента", ButtonType.OK);
             alert.showAndWait();
 
         }
     }
+
+    public void updateListS(Path path) {
+
+        try {
+            //  наполним списком файлов которые есть куда указан любой путь
+
+            textFieldS.setText(path.normalize().toAbsolutePath().toString());
+            serverView.getItems().clear();
+            serverView.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
+            serverView.sort();
+
+        } catch (IOException e) {
+            // Всплывающее окно. И подождать пока пользователь нажмет на ок
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось обновить список файлов сервера", ButtonType.OK);
+            alert.showAndWait();
+
+        }
+    }
+
     public void exit(ActionEvent actionEvent) {
         Platform.exit();
     }
@@ -234,12 +278,45 @@ public class ClientController implements Initializable {
         }
     }
 
+    public void btnPathUpActionS(ActionEvent actionEvent) {
+        Path upperPath = Paths.get(textFieldS.getText()).getParent();//путь вернет родителя
+        if (upperPath != null) {
+            updateListS(upperPath);
+        }
+    }
+
     // при выборе диска, переходим в его корень
     public void selectionDiskAction(ActionEvent actionEvent) {
         ComboBox<String> element = (ComboBox<String>) actionEvent.getSource();
         updateList(Paths.get(element.getSelectionModel().getSelectedItem()));
 
     }
+
+    public void selectionDiskActionS(ActionEvent actionEvent) {
+        ComboBox<String> element = (ComboBox<String>) actionEvent.getSource();
+        updateListS(Paths.get(element.getSelectionModel().getSelectedItem()));
+
+    }
+
+    // проверка на активную таблицу, вернет имя и путь выделенного файла
+    public String getSelectedFileName() {
+        if (clientView.isFocused()) {
+            return clientView.getSelectionModel().getSelectedItem().getFilename();
+
+        } else if (serverView.isFocused()) {
+            return serverView.getSelectionModel().getSelectedItem().getFilename();
+        }
+        return null;
+    }
+
+    public String getCurrentPath() {
+        return textField.getText();
+    }
+
+    public String getCurrentPathS() {
+        return textFieldS.getText();
+    }
+
     private void updateServerView(List<String> names) {
         /*Platform.runLater(() -> {
             serverView.getItems().clear();
@@ -249,8 +326,93 @@ public class ClientController implements Initializable {
 
 
     public void downLoad(ActionEvent actionEvent) {
+        if (getSelectedFileName() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, " Ни один файл не выбран", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        if (clientView.isFocused()) {
+            Path srcPath = Paths.get(getCurrentPath(), getSelectedFileName());// формируем путь к файлу откуда будем копировать
+            Path dstPath = Paths.get(getCurrentPathS()).resolve(srcPath.getFileName());// скопируем в корневой каталог с именем как с клиента
+            try {
+                Files.move(srcPath, dstPath);
+                updateListS(Paths.get(getCurrentPathS()));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, " Не удалось скопировать файл", ButtonType.OK);
+                alert.showAndWait();
+            }
+
+        } else {
+            Path srcPath = Paths.get(getCurrentPathS(), getSelectedFileName());// формируем путь к файлу откуда будем копировать
+            Path dstPath = Paths.get(getCurrentPath()).resolve(srcPath.getFileName());// скопируем в корневой каталог с именем как с клиента
+            try {
+                Files.move(srcPath, dstPath);
+                updateList(Paths.get(getCurrentPath()));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, " Не удалось скопировать файл", ButtonType.OK);
+                alert.showAndWait();
+            }
+        }
     }
 
+
     public void upLoad(ActionEvent actionEvent) {
+        if (getSelectedFileName() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, " Ни один файл не выбран", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        if (clientView.isFocused()) {
+            Path srcPath = Paths.get(getCurrentPath(), getSelectedFileName());// формируем путь к файлу откуда будем копировать
+            Path dstPath = Paths.get(getCurrentPathS()).resolve(srcPath.getFileName());// скопируем в корневой каталог с именем как с клиента
+            try {
+                Files.move(srcPath, dstPath);
+                updateListS(Paths.get(getCurrentPathS()));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, " Не удалось переместить файл", ButtonType.OK);
+                alert.showAndWait();
+            }
+
+        } else {
+            Path srcPath = Paths.get(getCurrentPathS(), getSelectedFileName());// формируем путь к файлу откуда будем копировать
+            Path dstPath = Paths.get(getCurrentPath()).resolve(srcPath.getFileName());// скопируем в корневой каталог с именем как с клиента
+            try {
+                Files.move(srcPath, dstPath);
+                updateList(Paths.get(getCurrentPath()));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, " Не удалось переместить файл", ButtonType.OK);
+                alert.showAndWait();
+            }
+        }
+    }
+
+    public void copyBtn(ActionEvent actionEvent) {
+        if (getSelectedFileName() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, " Ни один файл не выбран", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        if (clientView.isFocused()) {
+            Path srcPath = Paths.get(getCurrentPath(), getSelectedFileName());// формируем путь к файлу откуда будем копировать
+            Path dstPath = Paths.get(getCurrentPathS()).resolve(srcPath.getFileName());// скопируем в корневой каталог с именем как с клиента
+            try {
+                Files.copy(srcPath, dstPath);
+                updateListS(Paths.get(getCurrentPathS()));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, " Не удалось скопировать файл", ButtonType.OK);
+                alert.showAndWait();
+            }
+
+        } else {
+            Path srcPath = Paths.get(getCurrentPathS(), getSelectedFileName());// формируем путь к файлу откуда будем копировать
+            Path dstPath = Paths.get(getCurrentPath()).resolve(srcPath.getFileName());// скопируем в корневой каталог с именем как с клиента
+            try {
+                Files.copy(srcPath, dstPath);
+                updateList(Paths.get(getCurrentPath()));
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, " Не удалось скопировать файл", ButtonType.OK);
+                alert.showAndWait();
+            }
+        }
     }
 }

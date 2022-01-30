@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5d6ad025-6fcf-43f9-b2a8-67622389d837" name="Default Changelist" comment="Java File Manager" />
+    <list default="true" id="5d6ad025-6fcf-43f9-b2a8-67622389d837" name="Default Changelist" comment="Java File Manager">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/geekbrains/cloud/client/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/geekbrains/cloud/client/ClientController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/geekbrains/cloud/client/client.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/geekbrains/cloud/client/client.fxml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,7 +39,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Урок 4 Stream API/cloud-storage-jan-2022-master" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -164,6 +168,7 @@
       <workItem from="1643049088323" duration="378000" />
       <workItem from="1643212385710" duration="9453000" />
       <workItem from="1643225286399" duration="4164000" />
+      <workItem from="1643229641098" duration="22656000" />
     </task>
     <task id="LOCAL-00001" summary="Lesson 2. Nio">
       <created>1640630642652</created>
@@ -186,16 +191,62 @@
       <option name="project" value="LOCAL" />
       <updated>1642704428669</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Java File Manager">
+      <created>1643229738834</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1643229738834</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Lesson 2. Nio" />
     <MESSAGE value="Lesson 3. Netty" />
     <MESSAGE value="Lesson 4. StreamApi" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lesson 4. StreamApi" />
+    <MESSAGE value="Java File Manager" />
+    <option name="LAST_COMMIT_MESSAGE" value="Java File Manager" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-field">
+          <url>file://$PROJECT_DIR$/src/main/java/com/geekbrains/cloud/client/ClientController.java</url>
+          <line>42</line>
+          <properties field="currentDir" class="com.geekbrains.cloud.client.ClientController" />
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/geekbrains/cloud/client/ClientController.java</url>
+          <line>364</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/geekbrains/cloud/client/ClientController.java</url>
+          <line>394</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="fileTypeColumn" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
